@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coin Clicker</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; padding: 16px; }
+    .coin-icon { width: 80px; height: 80px; display:block; margin-bottom:12px; cursor:pointer; }
+    .buttons { display:flex; flex-wrap:wrap; margin:8px; margin-top:12px; }
+    #coin_counter { font-weight: 700; font-size: 20px; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <img src="Coin.png" class="coin-icon" alt="Coin" onclick="click_actie()">
+  <div id="coin_counter">Coins: 0</div>
+
+  <div class="buttons">
+    <button onclick="click_actie()">Coin</button>
+    <button onclick="Upgrade10()">Upgrade (10 Coins)</button>
+    <button onclick="Upgrade50()">Upgrade (50 Coins)</button>
+    <button onclick="Upgrade100()">Upgrade (100 Coins)</button>
+    <button onclick="Upgrade1000()">Upgrade (1000 Coins)</button>
+    <button onclick="Upgrade2000()">Upgrade (2000 Coins)</button>
+    <button onclick="Upgrade10000()">Upgrade (10000 Coins)</button>
+    <button onclick="Upgrade50000()">Upgrade (50000 Coins)</button>
+  </div>
+
+  <script>
+    let coin = 0;
+    let klik_kracht = 1;
+
+    let autoCoinIncrement10 = 0;
+    let autoCoinIncrement50 = 0;
+    let autoCoinIncrement100 = 0;
+    let autoCoinIncrement1000 = 0;
+    let autoCoinIncrement2000 = 0;
+    let autoCoinIncrement10000 = 0;
+    let autoCoinIncrement50000 = 0;
+
+    function autoCoin() {
+      coin += (
+        autoCoinIncrement10 +
+        autoCoinIncrement50 +
+        autoCoinIncrement100 +
+        autoCoinIncrement1000 +
+        autoCoinIncrement2000 +
+        autoCoinIncrement10000 +
+        autoCoinIncrement50000
+      );
+    }
+
+    function click_actie() {
+      coin += klik_kracht;
+      ui_update();
+    }
+
+    function Upgrade10() {
+      if (coin >= 10) {
+        coin -= 10;
+        klik_kracht += 1;
+        autoCoinIncrement10 += 1;
+        ui_update();
+      }
+    }
+
+    function Upgrade50() {
+      if (coin >= 50) {
+        coin -= 50;
+        klik_kracht += 1;
+        autoCoinIncrement50 += 5;
+        ui_update();
+      }
+    }
+
+    function Upgrade100() {
+      if (coin >= 100) {
+        coin -= 100;
+        klik_kracht += 1;
+        autoCoinIncrement100 += 10;
+        ui_update();
+      }
+    }
+
+    function Upgrade1000() {
+      if (coin >= 1000) {
+        coin -= 1000;
+        klik_kracht += 1;
+        autoCoinIncrement1000 += 100;
+        ui_update();
+      }
+    }
+
+    function Upgrade2000() {
+      if (coin >= 2000) {
+        coin -= 2000;
+        klik_kracht += 1;
+        autoCoinIncrement2000 += 200;
+        ui_update();
+      }
+    }
+
+    function Upgrade10000() {
+      if (coin >= 10000) {
+        coin -= 10000;
+        klik_kracht += 1;
+        autoCoinIncrement10000 += 1000;
+        ui_update();
+      }
+    }
+
+    function Upgrade50000() {
+      if (coin >= 50000) {
+        coin -= 50000;
+        klik_kracht += 1;
+        autoCoinIncrement50000 += 5000;
+        ui_update();
+      }
+    }
+
+    function ui_update() {
+      const el = document.getElementById("coin_counter");
+      el.innerText = `Coins: ${coin} (: +${klik_kracht})`;
+    }
+
+    setInterval(() => { autoCoin(); ui_update(); }, 1000);
+
+    ui_update();
+  </script>
+</body>
+</html>
