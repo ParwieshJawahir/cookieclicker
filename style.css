@@ -1,0 +1,107 @@
+body {
+  font-family: system-ui, Arial, sans-serif;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  transition: background-color 0.6s ease;
+}
+
+.left-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.coin-icon {
+  width: 300px;
+  height: 300px;
+  display: block;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.coin-counter {
+  font-weight: 700;
+  font-size: 20px;
+  margin: 8px 0;
+}
+
+.theme-display {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-icon {
+  width: 60px;     
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-label {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+
+.purchases {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 240px;
+}
+
+.purchases h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.purchases-list {
+  list-style-type: disc;
+  padding-left: 18px;
+  font-size: 14px;
+  color: #444;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.buttons button {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: gold;
+  color: black;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.buttons button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.buttons button:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
