@@ -4,26 +4,32 @@
   <meta charset="UTF-8" />
   <title>Coin Clicker</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; padding: 16px; }
-    .coin-icon { width: 80px; height: 80px; display:block; margin-bottom:12px; cursor:pointer; }
-    .buttons { display:flex; flex-wrap:wrap; margin:8px; margin-top:12px; }
-    #coin_counter { font-weight: 700; font-size: 20px; margin: 8px 0; }
-  </style>
 </head>
 <body>
-  <img src="Coin.png" class="coin-icon" alt="Coin" onclick="click_actie()">
-  <div id="coin_counter">Coins: 0</div>
+  <div class="left-side">
+    <img src="Coin.png" class="coin-icon" alt="Coin" onclick="click_actie()">
+    <div class="coin-counter">Coins: 0</div>
+
+    <div class="theme-display">
+      <img class="theme-icon" alt="Theme" style="display:none;">
+      <div class="theme-label">Theme:</div>
+    </div>
+
+    
+    <div class="purchases">
+      <h3>Gekochte upgrades:</h3>
+      <ul class="purchases-list"></ul>
+    </div>
+  </div>
 
   <div class="buttons">
-    <button onclick="click_actie()">Coin</button>
-    <button onclick="Upgrade10()">Upgrade (10 Coins)</button>
-    <button onclick="Upgrade50()">Upgrade (50 Coins)</button>
-    <button onclick="Upgrade100()">Upgrade (100 Coins)</button>
-    <button onclick="Upgrade1000()">Upgrade (1000 Coins)</button>
-    <button onclick="Upgrade2000()">Upgrade (2000 Coins)</button>
-    <button onclick="Upgrade10000()">Upgrade (10000 Coins)</button>
-    <button onclick="Upgrade50000()">Upgrade (50000 Coins)</button>
+    <button id="upgrade10" onclick="Upgrade10()">Upgrade (10 Coins)</button>
+    <button id="upgrade50" onclick="Upgrade50()">Upgrade (50 Coins)</button>
+    <button id="upgrade100" onclick="Upgrade100()">Upgrade (100 Coins)</button>
+    <button id="upgrade1000" onclick="Upgrade1000()">Upgrade (1000 Coins)</button>
+    <button id="upgrade2000" onclick="Upgrade2000()">Upgrade (2000 Coins)</button>
+    <button id="upgrade10000" onclick="Upgrade10000()">Upgrade (10000 Coins)</button>
+    <button id="upgrade50000" onclick="Upgrade50000()">Upgrade (50000 Coins)</button>
   </div>
 
   <script>
@@ -37,6 +43,25 @@
     let autoCoinIncrement2000 = 0;
     let autoCoinIncrement10000 = 0;
     let autoCoinIncrement50000 = 0;
+
+    const THEMES = {
+      1: { name: "Bank", file: "bank.png" },
+      2: { name: "Exchange", file: "exchange.png" },
+      3: { name: "Global Trade", file: "global_trade.png" },
+      4: { name: "Kingdom", file: "kingdom.png" },
+      5: { name: "Stock Market", file: "Stock_market.png" },
+      6: { name: "Tax", file: "tax.png" },
+      7: { name: "Wallet", file: "wallet.png" }
+    };
+
+    function setTheme(index) {
+      const theme = THEMES[index];
+      const icon  = document.querySelector(".theme-icon");
+      const label = document.querySelector(".theme-label");
+      icon.src = theme.file;
+      icon.style.display = "block";
+      label.innerText = `${index} ${theme.name}`;
+    }
 
     function autoCoin() {
       coin += (
@@ -60,70 +85,95 @@
         coin -= 10;
         klik_kracht += 1;
         autoCoinIncrement10 += 1;
+        setTheme(1);
         ui_update();
       }
     }
-
     function Upgrade50() {
       if (coin >= 50) {
         coin -= 50;
-        klik_kracht += 1;
+        klik_kracht += 2;
         autoCoinIncrement50 += 5;
+        setTheme(2);
         ui_update();
       }
     }
-
     function Upgrade100() {
       if (coin >= 100) {
         coin -= 100;
-        klik_kracht += 1;
+        klik_kracht += 3;
         autoCoinIncrement100 += 10;
+        setTheme(3);
         ui_update();
       }
     }
-
     function Upgrade1000() {
       if (coin >= 1000) {
         coin -= 1000;
-        klik_kracht += 1;
+        klik_kracht += 5;
         autoCoinIncrement1000 += 100;
+        setTheme(4);
         ui_update();
       }
     }
-
     function Upgrade2000() {
       if (coin >= 2000) {
         coin -= 2000;
-        klik_kracht += 1;
+        klik_kracht += 10;
         autoCoinIncrement2000 += 200;
+        setTheme(5);
         ui_update();
       }
     }
-
     function Upgrade10000() {
       if (coin >= 10000) {
         coin -= 10000;
-        klik_kracht += 1;
+        klik_kracht += 20;
         autoCoinIncrement10000 += 1000;
+        setTheme(6);
         ui_update();
       }
     }
-
     function Upgrade50000() {
       if (coin >= 50000) {
         coin -= 50000;
-        klik_kracht += 1;
+        klik_kracht += 50;
         autoCoinIncrement50000 += 5000;
+        setTheme(7);
         ui_update();
       }
     }
 
     function ui_update() {
-      const el = document.getElementById("coin_counter");
-      el.innerText = `Coins: ${coin} (: +${klik_kracht})`;
+      
+      const counter = document.querySelector(".coin-counter");
+      counter.innerText = `Coins: ${coin} (+${klik_kracht} per klik)`;
+
+      
+      document.getElementById("upgrade10").disabled = coin < 10;
+      document.getElementById("upgrade50").disabled = coin < 50;
+      document.getElementById("upgrade100").disabled = coin < 100;
+      document.getElementById("upgrade1000").disabled = coin < 1000;
+      document.getElementById("upgrade2000").disabled = coin < 2000;
+      document.getElementById("upgrade10000").disabled = coin < 10000;
+      document.getElementById("upgrade50000").disabled = coin < 50000;
+
+      
+      const list = document.querySelector(".purchases-list");
+      list.innerHTML = "";
+      if (autoCoinIncrement10 > 0)  list.innerHTML += `<li>Upgrade 10 gekocht: ${autoCoinIncrement10}x</li>`;
+      if (autoCoinIncrement50 > 0)  list.innerHTML += `<li>Upgrade 50 gekocht: ${autoCoinIncrement50}x</li>`;
+      if (autoCoinIncrement100 > 0) list.innerHTML += `<li>Upgrade 100 gekocht: ${autoCoinIncrement100}x</li>`;
+      if (autoCoinIncrement1000 > 0) list.innerHTML += `<li>Upgrade 1000 gekocht: ${autoCoinIncrement1000}x</li>`;
+      if (autoCoinIncrement2000 > 0) list.innerHTML += `<li>Upgrade 2000 gekocht: ${autoCoinIncrement2000}x</li>`;
+      if (autoCoinIncrement10000 > 0) list.innerHTML += `<li>Upgrade 10000 gekocht: ${autoCoinIncrement10000}x</li>`;
+      if (autoCoinIncrement50000 > 0) list.innerHTML += `<li>Upgrade 50000 gekocht: ${autoCoinIncrement50000}x</li>`;
     }
 
-    setInterval(() => { autoCoin(); ui_update(); }, 1000);
+    setInterval(() => {
+      autoCoin();
+      ui_update();
+    }, 1000);
 
     ui_update();
   </script>
