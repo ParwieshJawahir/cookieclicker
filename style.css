@@ -1,107 +1,353 @@
+/* =======================
+   Algemene pagina styling
+======================= */
 body {
-  font-family: system-ui, Arial, sans-serif;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  transition: background-color 0.6s ease;
+    font-family: system-ui, Arial, sans-serif;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    min-height: 100dvh;
+
+    /* Standaardachtergrond; JS kan deze wisselen */
+    background-image: url("Geldautomaat.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+
+    position: relative; /* nodig voor overlay-laag */
+    overflow-x: hidden;
 }
 
+/* Donkere overlay voor leesbaarheid (blijft ook werken bij wisselen) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 0;           /* overlay onder content */
+    pointer-events: none;  /* klik niet blokkeren */
+}
+
+/* Zorg dat hoofd-content boven de overlay staat */
+.left-side,
+.buttons,
+#achievementPopup {
+    position: relative;
+    z-index: 1;
+}
+
+/* =======================
+   Linkerzijde
+======================= */
 .left-side {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 .coin-icon {
-  width: 300px;
-  height: 300px;
-  display: block;
-  margin-bottom: 12px;
-  cursor: pointer;
+    width: 300px;
+    height: 300px;
+    display: block;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    will-change: transform;
 }
 
-.coin-counter {
-  font-weight: 700;
-  font-size: 20px;
-  margin: 8px 0;
+/* Coin klik animatie */
+.coin-icon.clicked {
+    transform: scale(1.1);
 }
 
-.theme-display {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+#coin_counter {
+    font-weight: 700;
+    font-size: 20px;
+    margin: 8px 0;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(0,0,0,0.9);
 }
 
-.theme-icon {
-  width: 60px;     
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+#theme_display {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.theme-label {
-  font-weight: 700;
-  font-size: 16px;
+#theme_icon {
+    width: 120px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-
-.purchases {
-  margin-top: 20px;
-  padding: 10px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  width: 240px;
+#theme_label {
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    text-shadow: 0 0 4px rgba(0,0,0,0.9);
 }
 
-.purchases h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: #333;
+/* =======================
+   Extra upgrades links onder
+======================= */
+.extra-upgrades {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    gap: 8px;
 }
 
-.purchases-list {
-  list-style-type: disc;
-  padding-left: 18px;
-  font-size: 14px;
-  color: #444;
+.extra-upgrade {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.extra-upgrade:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+/* =======================
+   Knoppen styling (rechts)
+======================= */
 .buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
 }
 
 .buttons button {
-  padding: 10px 14px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background: gold;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
+    padding: 10px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: gold;
+    color: #111;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.25);
+    transition: transform 0.1s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .buttons button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 14px rgba(0,0,0,0.35);
+    filter: brightness(1.02);
 }
 
 .buttons button:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(1px) scale(0.99);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .buttons button:disabled {
-  background: #ccc;
-  color: #666;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+    background: #cfcfcf;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Upgrade count span */
+.buttons button span {
+    font-weight: 900;
+    margin-left: 8px;
+    color: #111;
+}
+
+/* Upgrade flash/press effecten */
+.upgrade-flash {
+    animation: flash 0.4s ease;
+}
+
+@keyframes flash {
+    0%   { background-color: #fff7a3; }
+    100% { background-color: gold; }
+}
+
+.upgrade-press {
+    transform: scale(0.96);
+}
+
+/* =======================
+   Floating tekst
+======================= */
+.floating-text {
+    position: absolute;
+    font-weight: 900;
+    font-size: 18px;
+    color: gold;
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+    text-shadow: 0 0 3px #000;
+    z-index: 500;
+}
+
+@keyframes floatUp {
+    0%   { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+}
+
+/* =======================
+   Achievement popup
+======================= */
+#achievementPopup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: gold;
+    color: #111;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 900;
+    font-size: 18px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    display: none;
+    z-index: 1000;
+    text-align: center;
+    animation: popupFade 2s forwards;
+}
+
+@keyframes popupFade {
+    0%   { opacity: 0; transform: translate(-50%, -20px); }
+    20%  { opacity: 1; transform: translate(-50%, 0); }
+    80%  { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* =======================
+   Unlocked panel (wisselen)
+======================= */
+.unlocked-panel {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 10px;
+    color: #fff;
+    backdrop-filter: blur(4px);
+    width: 300px; /* smal blok onder je knoppen */
+}
+
+.unlocked-panel h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.unlocked-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+/* Klikbare badges (buttons) */
+.unlock-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    cursor: pointer;
+    text-align: left;
+    color: #fff;
+}
+
+.unlock-badge:hover {
+    background: rgba(255,255,255,0.14);
+}
+
+.unlock-badge.active {
+    outline: 2px solid gold;
+    background: rgba(255,255,255,0.18);
+}
+
+.unlock-badge img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.unlock-badge .name {
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1.1;
+}
+
+/* =======================
+   Particles styling
+======================= */
+.coin-particle,
+.cake-particle,
+.soccer-particle,
+.diamond-particle,
+.galaxy-particle,
+.arcade-particle,
+.death-particle,
+.crown-particle,
+.angel-particle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-size: cover;
+    animation: particleMove 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 600;
+}
+
+/* Particle images per type */
+.coin-particle    { background-image: url("Coin.png");     border-radius: 50%; }
+.cake-particle    { background-image: url("Minecraft.png");     border-radius: 6px; }
+.soccer-particle  { background-image: url("Soccer.png");   border-radius: 50%; }
+.diamond-particle { background-image: url("Diamond.png");  border-radius: 4px; }
+.galaxy-particle  { background-image: url("Galaxy.png");   border-radius: 8px; }
+.arcade-particle  { background-image: url("Arcade.png");   border-radius: 6px; }
+.death-particle   { background-image: url("Death.png");    border-radius: 50%; }
+.crown-particle   { background-image: url("Crown.png");    border-radius: 6px; }
+.angel-particle   { background-image: url("Engel.png");    border-radius: 50%; }
+
+@keyframes particleMove {
+    from { transform: translate(0,0) scale(1); opacity: 1; }
+    to   { transform: translate(var(--x), var(--y)) scale(0.5); opacity: 0; }
+}
+
+/* =======================
+   Responsive tweaks
+======================= */
+@media (max-width: 900px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .left-side, .buttons {
+        width: 100%;
+        align-items: center;
+    }
+
+    .buttons { margin-top: 8px; }
+
+    .coin-icon { width: 200px; height: 200px; }
+    #theme_icon { width: 80px; }
+    .extra-upgrade { width: 40px; height: 40px; }
+
+    .unlocked-panel { width: 100%; }
 }
