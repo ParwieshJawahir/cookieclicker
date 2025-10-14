@@ -351,3 +351,54 @@ body::before {
 
     .unlocked-panel { width: 100%; }
 }
+
+.minigame-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.minigame-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    color: #fff;
+    backdrop-filter: blur(6px);
+    width: 300px;
+}
+
+#minigame-timer {
+    font-size: 24px;
+    font-weight: 900;
+    margin: 8px 0;
+}
+
+#minigame-score {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
+#minigame-coin {
+    width: 150px;
+    height: 150px;
+    cursor: pointer;
+    margin: 16px 0;
+    transition: transform 0.1s ease;
+}
+
+#minigame-coin.clicked {
+    transform: scale(1.1);
+}
+
+#minigame-result p {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 8px 0;
+}
+
