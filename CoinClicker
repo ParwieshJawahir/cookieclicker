@@ -170,6 +170,24 @@ function ensureUnlockedPanel(){
       <div id="unlocked_list" class="unlocked-list"></div>
       <div class="panel-controls" style="margin-top:10px;display:flex;justify-content:flex-end;">
         <button id="btnReset" type="button">Reset progress</button>
+        <button id="btn-minigame">Start Minigame</button>
+
+<!-- Minigame overlay -->
+<div id="minigame-overlay" class="minigame-overlay" style="display:none;">
+  <div class="minigame-container">
+    <h2>Minigame: Klik zoveel mogelijk munten!</h2>
+    <div id="minigame-timer">60</div>
+    <div id="minigame-score">Score: 0</div>
+    <img src="Coin.png" id="minigame-coin" class="coin-icon" alt="Coin">
+
+    <div id="minigame-result" style="display:none;">
+      <p id="minigame-final-score"></p>
+      <p id="minigame-highscore"></p>
+      <button id="btn-return">Terug naar hoofdspel</button>
+    </div>
+  </div>
+</div>
+
       </div>
     `;
     document.querySelector(".buttons").appendChild(panel);
@@ -543,6 +561,79 @@ window.addEventListener('beforeunload', saveGame);
 
 /* 6) Eerste UI update */
 ui_update();
+
+class MiniGame {
+    constructor() {
+        this.score = 0;
+        this.highscore = Number(localStorage.getItem('minigame_highscore') || 0);
+        this.timeLeft = 60; // 60 seconden
+        this.timerInterval = null;
+
+        // DOM elementen
+        this.overlay = document.getElementById('minigame-overlay');
+        this.coin = document.getElementById('minigame-coin');
+        this.timerEl = document.getElementById('minigame-timer');
+        this.scoreEl = document.getElementById('minigame-score');
+        this.result = document.getElementById('minigame-result');
+        this.finalScore = document.getElementById('minigame-final-score');
+        this.highscoreEl = document.getElementById('minigame-highscore');
+        this.btnReturn = document.getElementById('btn-return');
+
+        // Event listeners
+        this.coin.addEventListener('click', () => this.clickCoin());
+        this.btnReturn.addEventListener('click', () => this.close());
+        document.getElementById('btn-minigame').addEventListener('click', () => this.start());
+    }
+
+    start() {
+        this.score = 0;
+        this.timeLeft = 60;
+        this.overlay.style.display = 'flex';
+        this.result.style.display = 'none';
+        this.updateUI();
+
+        this.timerInterval = setInterval(() => {
+            this.timeLeft--;
+            this.timerEl.textContent = this.timeLeft;
+            if (this.timeLeft <= 0) this.end();
+        }, 1000);
+    }
+
+    clickCoin() {
+        this.score++;
+        this.scoreEl.textContent = `Score: ${this.score}`;
+        this.coin.classList.add('clicked');
+        setTimeout(() => this.coin.classList.remove('clicked'), 100);
+    }
+
+    end() {
+        clearInterval(this.timerInterval);
+        this.result.style.display = 'block';
+        this.finalScore.textContent = `Jouw score: ${this.score}`;
+        if(this.score > this.highscore){
+            this.highscore = this.score;
+            localStorage.setItem('minigame_highscore', this.highscore);
+        }
+        this.highscoreEl.textContent = `Highscore: ${this.highscore}`;
+    }
+
+    close() {
+        this.overlay.style.display = 'none';
+    }
+
+    updateUI() {
+        this.timerEl.textContent = this.timeLeft;
+        this.scoreEl.textContent = `Score: ${this.score}`;
+    }
+}
+
+// Init minigame
+const minigame = new MiniGame();
+
+
+
+
+
 </script>
 
 </body>
