@@ -5,92 +5,28 @@ class GameConfig {
         UNLOCKED_ORDER: 'unlocked_order',
         CURRENT_WORLD: 'current_world_key',
         MINIGAME_HIGHSCORE: 'minigame_highscore'
-    }; 
+    };
 
     static UPGRADES = [
-        {
-            cost: 10,
-            clickInc: 1,
-            autoInc: 1,
-            unlockLevel: 50,
-            themeIndex: 0
-        },
-        {
-            cost: 50,
-            clickInc: 2,
-            autoInc: 5,
-            unlockLevel: 100,
-            themeIndex: 1
-        },
-        {
-            cost: 100,
-            clickInc: 3,
-            autoInc: 10,
-            unlockLevel: 150,
-            themeIndex: 2
-        },
-        {
-            cost: 1000,
-            clickInc: 5,
-            autoInc: 100,
-            unlockLevel: 200,
-            themeIndex: 3
-        },
-        {
-            cost: 2000,
-            clickInc: 10,
-            autoInc: 200,
-            unlockLevel: 250,
-            themeIndex: 4
-        },
-        {
-            cost: 10000,
-            clickInc: 20,
-            autoInc: 1000,
-            unlockLevel: 300,
-            themeIndex: 5
-        },
-        {
-            cost: 50000,
-            clickInc: 50,
-            autoInc: 5000,
-            unlockLevel: 350,
-            themeIndex: 6
-        },
-        {
-            cost: 100000,
-            clickInc: 100,
-            autoInc: 10000,
-            unlockLevel: 400,
-            themeIndex: 7
-        }
+        { cost: 10, clickInc: 1, autoInc: 1, unlockLevel: 50, themeIndex: 0 },
+        { cost: 50, clickInc: 2, autoInc: 5, unlockLevel: 100, themeIndex: 1 },
+        { cost: 100, clickInc: 3, autoInc: 10, unlockLevel: 150, themeIndex: 2 },
+        { cost: 1000, clickInc: 5, autoInc: 100, unlockLevel: 200, themeIndex: 3 },
+        { cost: 2000, clickInc: 10, autoInc: 200, unlockLevel: 250, themeIndex: 4 },
+        { cost: 10000, clickInc: 20, autoInc: 1000, unlockLevel: 300, themeIndex: 5 },
+        { cost: 50000, clickInc: 50, autoInc: 5000, unlockLevel: 350, themeIndex: 6 },
+        { cost: 100000, clickInc: 100, autoInc: 10000, unlockLevel: 400, themeIndex: 7 }
     ];
 
     static THEMES = [
-        {
-            name: 'Bank'
-        },
-        {
-            name: 'Exchange'
-        },
-        {
-            name: 'Global Trade'
-        },
-        {
-            name: 'Stock Market'
-        },
-        {
-            name: 'Tax'
-        },
-        {
-            name: 'Wallet'
-        },
-        {
-            name: 'Bitcoin'
-        },
-        {
-            name: 'Investment'
-        }
+        { name: 'Bank' },
+        { name: 'Exchange' },
+        { name: 'Global Trade' },
+        { name: 'Stock Market' },
+        { name: 'Tax' },
+        { name: 'Wallet' },
+        { name: 'Bitcoin' },
+        { name: 'Investment' }
     ];
 
     static WORLDS = {
@@ -182,14 +118,14 @@ class GameConfig {
     ];
 
     static getWorldByIndex(index) {
-        const worldKey = this.WORLD_ORDER[index + 1];
-        return this.WORLDS[worldKey];
+        return this.WORLDS[this.WORLD_ORDER[index + 1]];
     }
 
     static getParticleClass(themeIndex) {
         return this.PARTICLE_CLASSES[themeIndex] || 'coin-particle';
     }
 }
+
 class CoinClickerGame {
     constructor() {
         this.coins = 0;
@@ -211,13 +147,9 @@ class CoinClickerGame {
     loadGame() {
         const raw = localStorage.getItem(GameConfig.STORAGE_KEYS.GAME);
         if (raw) {
-            try {
-                const data = JSON.parse(raw);
-                this.coins = Number(data.coins || 0);
-                this.upgradeCounts = Array.isArray(data.counts) ? data.counts.map(n => Number(n)) : Array(8).fill(0);
-            } catch (e) {
-                console.error('Failed to load game:', e);
-            }
+            const data = JSON.parse(raw);
+            this.coins = Number(data.coins || 0);
+            this.upgradeCounts = Array.isArray(data.counts) ? data.counts.map(Number) : Array(8).fill(0);
         }
 
         const unlockedRaw = localStorage.getItem(GameConfig.STORAGE_KEYS.UNLOCKED_SET);
@@ -231,27 +163,26 @@ class CoinClickerGame {
     }
 
     saveGame() {
-        const data = {
+        localStorage.setItem(GameConfig.STORAGE_KEYS.GAME, JSON.stringify({
             coins: this.coins,
             counts: this.upgradeCounts
-        };
-        localStorage.setItem(GameConfig.STORAGE_KEYS.GAME, JSON.stringify(data));
-        localStorage.setItem(GameConfig.STORAGE_KEYS.UNLOCKED_SET, JSON.stringify(Array.from(this.unlockedWorlds)));
+        }));
+        localStorage.setItem(GameConfig.STORAGE_KEYS.UNLOCKED_SET, JSON.stringify([...this.unlockedWorlds]));
         localStorage.setItem(GameConfig.STORAGE_KEYS.UNLOCKED_ORDER, JSON.stringify(this.unlockedOrder));
         localStorage.setItem(GameConfig.STORAGE_KEYS.CURRENT_WORLD, this.currentWorld);
     }
 
     reconcileUnlocks() {
         const allowed = new Set(['default']);
-        GameConfig.UPGRADES.forEach((upgrade, index) => {
-            if (this.upgradeCounts[index] >= upgrade.unlockLevel) {
-                const world = GameConfig.getWorldByIndex(index);
-                if (world) allowed.add(world.key);
+        GameConfig.UPGRADES.forEach((u, i) => {
+            if (this.upgradeCounts[i] >= u.unlockLevel) {
+                const w = GameConfig.getWorldByIndex(i);
+                if (w) allowed.add(w.key);
             }
         });
 
-        this.unlockedOrder = this.unlockedOrder.filter(key => allowed.has(key));
-        if (!this.unlockedOrder.length) this.unlockedOrder = ['default'];
+        this.unlockedOrder = this.unlockedOrder.filter(w => allowed.has(w));
+        if (this.unlockedOrder.length === 0) this.unlockedOrder = ['default'];
         this.unlockedWorlds = allowed;
 
         if (!allowed.has(this.currentWorld)) this.currentWorld = 'default';
@@ -259,16 +190,12 @@ class CoinClickerGame {
     }
 
     recalculate() {
-        this.clickPower = 1 + GameConfig.UPGRADES.reduce((sum, upgrade, i) =>
-            sum + upgrade.clickInc * this.upgradeCounts[i], 0
-        );
-        this.autoIncrement = GameConfig.UPGRADES.map((upgrade, i) =>
-            upgrade.autoInc * this.upgradeCounts[i]
-        );
+        this.clickPower = 1 + GameConfig.UPGRADES.reduce((t, u, i) => t + u.clickInc * this.upgradeCounts[i], 0);
+        this.autoIncrement = GameConfig.UPGRADES.map((u, i) => u.autoInc * this.upgradeCounts[i]);
     }
 
     startAutoIncrement() {
-        if (this.autoInterval) clearInterval(this.autoInterval);
+        clearInterval(this.autoInterval);
         this.autoInterval = setInterval(() => {
             const total = this.autoIncrement.reduce((a, b) => a + b, 0);
             if (total > 0) {
@@ -284,22 +211,22 @@ class CoinClickerGame {
         this.spawnEffects();
     }
 
-    buyUpgrade(index) {
-        const upgrade = GameConfig.UPGRADES[index];
-        if (!upgrade || this.coins < upgrade.cost) return;
+    buyUpgrade(i) {
+        const u = GameConfig.UPGRADES[i];
+        if (!u || this.coins < u.cost) return;
 
-        this.coins -= upgrade.cost;
-        this.upgradeCounts[index]++;
+        this.coins -= u.cost;
+        this.upgradeCounts[i]++;
         this.recalculate();
 
-        if (this.upgradeCounts[index] === upgrade.unlockLevel) {
-            const world = GameConfig.getWorldByIndex(index);
-            if (world && !this.unlockedWorlds.has(world.key)) {
-                this.unlockedWorlds.add(world.key);
-                this.unlockedOrder.push(world.key);
-                this.showAchievement(world.message);
-                this.currentWorld = world.key;
-                this.applyWorld(world);
+        if (this.upgradeCounts[i] === u.unlockLevel) {
+            const w = GameConfig.getWorldByIndex(i);
+            if (w && !this.unlockedWorlds.has(w.key)) {
+                this.unlockedWorlds.add(w.key);
+                this.unlockedOrder.push(w.key);
+                this.showAchievement(w.message);
+                this.currentWorld = w.key;
+                this.applyWorld(w);
                 this.renderWorlds();
             }
         }
@@ -308,28 +235,29 @@ class CoinClickerGame {
         this.updateUI();
     }
 
-    applyWorld(world) {
-        document.body.style.background = world.bg;
-        document.getElementById('worldTitle').textContent = world.title;
+    applyWorld(w) {
+        document.body.style.background = w.bg;
+        document.getElementById('worldTitle').textContent = w.title;
         this.renderCoin();
     }
 
-    setWorld(worldKey) {
-        if (!this.unlockedWorlds.has(worldKey)) return;
-
-        this.currentWorld = worldKey;
-        this.applyWorld(GameConfig.WORLDS[worldKey]);
+    setWorld(key) {
+        if (!this.unlockedWorlds.has(key)) return;
+        this.currentWorld = key;
+        this.applyWorld(GameConfig.WORLDS[key]);
         this.renderWorlds();
         this.saveGame();
     }
 
     reset() {
         if (!confirm('Weet je zeker dat je alles wilt resetten?')) return;
+
         this.coins = 0;
         this.upgradeCounts = Array(8).fill(0);
         this.unlockedWorlds = new Set(['default']);
         this.unlockedOrder = ['default'];
         this.currentWorld = 'default';
+
         this.recalculate();
         this.saveGame();
         this.applyWorld(GameConfig.WORLDS.default);
@@ -338,90 +266,95 @@ class CoinClickerGame {
     }
 
     spawnEffects() {
-        const coinEl = document.getElementById('coinElement');
-        const rect = coinEl.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
+        const coin = document.getElementById('coinElement');
+        const r = coin.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const y = r.top + r.height / 2;
+
         const text = document.createElement('div');
         text.className = 'floating-text';
         text.textContent = `+${this.clickPower}`;
-        text.style.left = x + 'px';
-        text.style.top = y + 'px';
+        text.style.left = `${x}px`;
+        text.style.top = `${y}px`;
         document.body.appendChild(text);
         setTimeout(() => text.remove(), 900);
-        const world = GameConfig.WORLDS[this.currentWorld];
-        const particleClass = GameConfig.getParticleClass(world.themeIndex);
+
+        const w = GameConfig.WORLDS[this.currentWorld];
+        const cls = GameConfig.getParticleClass(w.themeIndex);
+
         for (let i = 0; i < 5; i++) {
             setTimeout(() => {
-                const particle = document.createElement('div');
-                particle.className = particleClass;
-                const angle = Math.random() * 2 * Math.PI;
-                const distance = 40 + Math.random() * 30;
-                particle.style.left = (x + Math.cos(angle) * distance) + 'px';
-                particle.style.top = (y + Math.sin(angle) * distance) + 'px';
-                document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 800);
+                const p = document.createElement('div');
+                p.className = cls;
+                const a = Math.random() * Math.PI * 2;
+                const d = 40 + Math.random() * 30;
+                p.style.left = `${x + Math.cos(a) * d}px`;
+                p.style.top = `${y + Math.sin(a) * d}px`;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 800);
             }, i * 20);
         }
     }
 
-    showAchievement(message) {
-        const existing = document.getElementById('achievementPopup');
-        if (existing) existing.remove();
+    showAchievement(msg) {
+        const old = document.getElementById('achievementPopup');
+        if (old) old.remove();
 
-        const popup = document.createElement('div');
-        popup.id = 'achievementPopup';
-        popup.className = 'achievement-popup';
-        popup.textContent = message;
-        document.body.appendChild(popup);
-        setTimeout(() => popup.remove(), 2000);
+        const p = document.createElement('div');
+        p.id = 'achievementPopup';
+        p.className = 'achievement-popup';
+        p.textContent = msg;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 2000);
     }
 
     updateUI() {
-        const coinCounter = document.getElementById('coinCounter');
-        coinCounter.textContent = `Coins: ${Math.floor(this.coins)} (+${this.clickPower} per klik)`;
+        document.getElementById('coinCounter').textContent =
+            `Coins: ${Math.floor(this.coins)} (+${this.clickPower} per klik)`;
 
-        GameConfig.UPGRADES.forEach((upgrade, index) => {
-            const btn = document.getElementById(`upgrade-btn-${index}`);
-            const count = document.getElementById(`upgrade-count-${index}`);
-            if (btn) btn.disabled = this.coins < upgrade.cost;
-            if (count) count.textContent = this.upgradeCounts[index];
+        GameConfig.UPGRADES.forEach((u, i) => {
+            const btn = document.getElementById(`upgrade-btn-${i}`);
+            const c = document.getElementById(`upgrade-count-${i}`);
+            if (btn) btn.disabled = this.coins < u.cost;
+            if (c) c.textContent = this.upgradeCounts[i];
         });
     }
 
     renderCoin() {
-        const coinEl = document.getElementById('coinElement');
-        const world = GameConfig.WORLDS[this.currentWorld];
-        const isEmoji = world.coin.length < 10;
+        const el = document.getElementById('coinElement');
+        const w = GameConfig.WORLDS[this.currentWorld];
+        const emoji = w.coin.length < 10;
 
-        if (isEmoji) coinEl.innerHTML = `<div class="coin-emoji">${world.coin}</div>`;
-        else coinEl.innerHTML = `<img src="${world.coin}" alt="Coin" class="coin-icon">`;
+        el.innerHTML = emoji
+            ? `<div class="coin-emoji">${w.coin}</div>`
+            : `<img src="${w.coin}" alt="Coin" class="coin-icon">`;
 
-        coinEl.onclick = () => this.click();
+        el.onclick = () => this.click();
     }
 
     renderUpgrades() {
         const grid = document.getElementById('upgradesGrid');
         grid.innerHTML = '';
 
-        GameConfig.UPGRADES.forEach((upgrade, index) => {
-            const theme = GameConfig.THEMES[upgrade.themeIndex];
+        GameConfig.UPGRADES.forEach((u, i) => {
+            const t = GameConfig.THEMES[u.themeIndex];
             const card = document.createElement('div');
             card.className = 'upgrade-card';
+
             card.innerHTML = `
                 <div class="upgrade-header">
-                    <div class="upgrade-name">${theme.name}</div>
-                    <div class="upgrade-count" id="upgrade-count-${index}">${this.upgradeCounts[index]}</div>
+                    <div class="upgrade-name">${t.name}</div>
+                    <div class="upgrade-count" id="upgrade-count-${i}">${this.upgradeCounts[i]}</div>
                 </div>
                 <div class="upgrade-stats">
-                    <div>👆 Click: +${upgrade.clickInc}</div>
-                    <div>⏱️ Auto: +${upgrade.autoInc}/s</div>
-                    <div class="unlock-info">Unlock: ${upgrade.unlockLevel}</div>
+                    <div>👆 Click: +${u.clickInc}</div>
+                    <div>⏱️ Auto: +${u.autoInc}/s</div>
+                    <div class="unlock-info">Unlock: ${u.unlockLevel}</div>
                 </div>
-                <button class="upgrade-button" id="upgrade-btn-${index}">${upgrade.cost} coins</button>
+                <button class="upgrade-button" id="upgrade-btn-${i}">${u.cost} coins</button>
             `;
-            const btn = card.querySelector(`#upgrade-btn-${index}`);
-            btn.onclick = () => this.buyUpgrade(index);
+
+            card.querySelector(`#upgrade-btn-${i}`).onclick = () => this.buyUpgrade(i);
             grid.appendChild(card);
         });
     }
@@ -429,17 +362,22 @@ class CoinClickerGame {
     renderWorlds() {
         const grid = document.getElementById('worldsGrid');
         grid.innerHTML = '';
-        this.unlockedOrder.forEach(key => {
-            const world = GameConfig.WORLDS[key];
-            if (!world) return;
 
-            const isEmoji = world.coin.length < 10;
-            const isActive = key === this.currentWorld;
+        this.unlockedOrder.forEach(key => {
+            const w = GameConfig.WORLDS[key];
+            if (!w) return;
+
+            const active = key === this.currentWorld;
+            const emoji = w.coin.length < 10;
+
             const btn = document.createElement('button');
-            btn.className = 'world-button' + (isActive ? ' active' : '');
-            btn.innerHTML = `<div class="world-icon">${isEmoji ? world.coin : `<img src="${world.coin}" alt="${world.title}">`}</div>
-                             <div class="world-name">${world.title}</div>`;
+            btn.className = 'world-button' + (active ? ' active' : '');
+            btn.innerHTML = `
+                <div class="world-icon">${emoji ? w.coin : `<img src="${w.coin}" alt="${w.title}">`}</div>
+                <div class="world-name">${w.title}</div>
+            `;
             btn.onclick = () => this.setWorld(key);
+
             grid.appendChild(btn);
         });
     }
@@ -457,6 +395,7 @@ class CoinClickerGame {
         document.getElementById('btnMinigame').onclick = () => new MiniGameModal().show();
     }
 }
+
 class MiniGameModal {
     constructor() {
         this.score = 0;
@@ -506,10 +445,13 @@ class MiniGameModal {
             this.highscore = this.score;
             localStorage.setItem(GameConfig.STORAGE_KEYS.MINIGAME_HIGHSCORE, this.highscore);
             document.getElementById('newHighscoreMsg').style.display = 'block';
-        } else document.getElementById('newHighscoreMsg').style.display = 'none';
+        } else {
+            document.getElementById('newHighscoreMsg').style.display = 'none';
+        }
 
         document.getElementById('minigamePlay').style.display = 'none';
         document.getElementById('minigameResults').style.display = 'block';
+
         document.getElementById('finalScore').textContent = `Jouw score: ${this.score}`;
         document.getElementById('finalHighscore').textContent = `Highscore: ${this.highscore}`;
     }
@@ -523,5 +465,5 @@ class MiniGameModal {
         document.getElementById('minigameModal').classList.remove('active');
     }
 }
-window.addEventListener('DOMContentLoaded', () => new CoinClickerGame());
 
+window.addEventListener('DOMContentLoaded', () => new CoinClickerGame());
