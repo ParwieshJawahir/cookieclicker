@@ -1,602 +1,534 @@
-let SAVE_KEY_GAME = "cc_game_v2";
+{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-let coin = 0;
-let klik_kracht = 1;
-let currentThemeIndex = -1;
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-size: cover;
+    transition: background 0.5s ease; 
+}
 
-let upgradeCounts = Array(8).fill(0);
-let autoCoinIncrements = Array(8).fill(0);
+.container {
+    max-width: 1400px;
+    margin: 0 auto; 
+    padding: 2rem;
+}
 
-let COSTS = [10, 50, 100, 1000, 2000, 10000, 50000, 100000];
-let CLICK_INC = [1, 2, 3, 5, 10, 20, 50, 100];
-let AUTO_INC = [1, 5, 10, 100, 200, 1000, 5000, 10000];
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
 
-let THEMES = [
-    {
-        name: "Bank",
-        file: "bank.png"
-    },
-    {
-        name: "Exchange",
-        file: "exchange.png"
-    },
-    {
-        name: "Global Trade",
-        file: "global_trade.png"
-    },
-    {
-        name: "Stock Market",
-        file: "Stock Market.png"
-    },
-    {
-        name: "Tax",
-        file: "tax.png"
-    },
-    {
-        name: "Wallet",
-        file: "wallet.png"
-    },
-    {
-        name: "Bitcoin",
-        file: "bitcoin.png"
-    },
-    {
-        name: "investment",
-        file: "investment.png"
-    },
-];
+.world-title {
+    font-size: 4rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1rem;
+}
 
-let WORLDS = {
-    default: {
-        title: "Normal",
-        coin: "Coin.png",
-        bg: "Marioworld.png",
-        themeIndex: -1
-    },
-    cake: {
-        title: "Cake World",
-        coin: "Minecraft.png",
-        bg: "Grass.png",
-        themeIndex: 0
-    },
-    diamond: {
-        title: "Diamond World",
-        coin: "Diamond.png",
-        bg: "Mine.png",
-        themeIndex: 1
-    },
-    galaxy: {
-        title: "Galaxy World",
-        coin: "Galaxy.png",
-        bg: "Space.png",
-        themeIndex: 2
-    },
-    crown: {
-        title: "Royal World",
-        coin: "Crown.png",
-        bg: "Palace.png",
-        themeIndex: 3
-    },
-    soccer: {
-        title: "Soccer World",
-        coin: "Soccer.png",
-        bg: "Stadion.png",
-        themeIndex: 4
-    },
-    arcade: {
-        title: "Arcade World",
-        coin: "Arcade.png",
-        bg: "Gamestate.png",
-        themeIndex: 5
-    },
-    death: {
-        title: "Death World",
-        coin: "Death.png",
-        bg: "Graveyard.png",
-        themeIndex: 6
-    },
-    angel: {
-        title: "Heaven World",
-        coin: "Engel.png",
-        bg: "Heaven.png",
-        themeIndex: 7
-    },
-};
+.coin-counter {
+    display: inline-block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+}
 
-function getUnlockedSet() {
-    try {
-        let raw = localStorage.getItem("unlocked_set");
-        return raw ? new Set(JSON.parse(raw)) : new Set();
-    } catch {
-        return new Set();
+.coin-display {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+}
+
+.coin-icon,
+.coin-emoji {
+    width: 200px;
+    height: 200px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s ease;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+}
+
+.coin-emoji {
+    font-size: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coin-icon:hover,
+.coin-emoji:hover {
+    transform: scale(1.05);
+}
+
+.coin-icon:active,
+.coin-emoji:active {
+    transform: scale(0.95);
+}
+
+.upgrades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.upgrade-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.upgrade-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.upgrade-count {
+    background: #3b82f6;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.upgrade-stats {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+.upgrade-stats div {
+    margin-bottom: 0.25rem;
+}
+
+.unlock-info {
+    font-size: 0.75rem;
+    color: #9333ea;
+    margin-top: 0.5rem;
+}
+
+.upgrade-button {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upgrade-button:not(:disabled) {
+    background: linear-gradient(to right, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.upgrade-button:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.upgrade-button:not(:disabled):active {
+    transform: scale(0.95);
+}
+
+.upgrade-button:disabled {
+    background: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
+.controls-panel {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.worlds-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.worlds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.world-button {
+    padding: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.world-button:hover {
+    transform: scale(1.05);
+}
+
+.world-button.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.world-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.world-icon img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.world-name {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.world-button.active .world-name {
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.action-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-minigame {
+    background: #9333ea;
+    color: white;
+}
+
+.btn-minigame:hover {
+    background: #7e22ce;
+}
+
+.btn-reset {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-reset:hover {
+    background: #b91c1c;
+}
+
+.achievement-popup {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #10b981;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    font-size: 1.25rem;
+    font-weight: bold;
+    z-index: 9999;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-10px);
     }
 }
 
-function getUnlockedOrder() {
-    try {
-        let raw = localStorage.getItem("unlocked_order");
-        return raw ? JSON.parse(raw) : [];
-    } catch {
-        return [];
+.floating-text {
+    position: fixed;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fbbf24;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 9999;
+    animation: floatUp 0.9s ease-out forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(-100px);
     }
 }
 
-function saveUnlocked(set, order) {
-    localStorage.setItem("unlocked_set", JSON.stringify(Array.from(set)));
-    localStorage.setItem("unlocked_order", JSON.stringify(order));
+.coin-particle,
+.cake-particle,
+.diamond-particle,
+.galaxy-particle,
+.crown-particle,
+.soccer-particle,
+.arcade-particle,
+.death-particle,
+.angel-particle {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFade 0.8s ease-out forwards;
 }
 
-function getCurrentWorldKey() {
-    return localStorage.getItem("current_world_key") || "";
+.coin-particle {
+    background: radial-gradient(circle, #fbbf24 0%, #f59e0b 100%);
+    box-shadow: 0 0 10px #fbbf24;
 }
 
-function setCurrentWorldKey(key) {
-    localStorage.setItem("current_world_key", key);
+.cake-particle {
+    background: radial-gradient(circle, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 0 10px #f093fb;
 }
 
-function addUnlock(key) {
-    if (!WORLDS[key]) return;
-    let set = getUnlockedSet();
-    let order = getUnlockedOrder();
-    if (!set.has(key)) {
-        set.add(key);
-        if (key === "default") {
-            order.unshift("default");
-        } else {
-            if (!order.includes("default")) order.unshift("default");
-            order.push(key);
-        }
-        saveUnlocked(set, order);
-        renderUnlocked();
+.diamond-particle {
+    background: radial-gradient(circle, #89f7fe 0%, #66a6ff 100%);
+    box-shadow: 0 0 10px #89f7fe;
+}
+
+.galaxy-particle {
+    background: radial-gradient(circle, #a78bfa 0%, #818cf8 100%);
+    box-shadow: 0 0 10px #a78bfa;
+}
+
+.crown-particle {
+    background: radial-gradient(circle, #fbbf24 0%, #f59e0b 100%);
+    box-shadow: 0 0 10px #fbbf24;
+}
+
+.soccer-particle {
+    background: radial-gradient(circle, #10b981 0%, #059669 100%);
+    box-shadow: 0 0 10px #10b981;
+}
+
+.arcade-particle {
+    background: radial-gradient(circle, #ec4899 0%, #db2777 100%);
+    box-shadow: 0 0 10px #ec4899;
+}
+
+.death-particle {
+    background: radial-gradient(circle, #6b7280 0%, #374151 100%);
+    box-shadow: 0 0 10px #6b7280;
+}
+
+.angel-particle {
+    background: radial-gradient(circle, #fef3c7 0%, #fde68a 100%);
+    box-shadow: 0 0 10px #fef3c7;
+}
+
+@keyframes particleFade {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0);
     }
 }
 
-function reconcileUnlocksWithProgress() {
-    let allowed = new Set(["default"]);
-    if (upgradeCounts[0] >= 50) allowed.add("cake");
-    if (upgradeCounts[1] >= 100) allowed.add("diamond");
-    if (upgradeCounts[2] >= 150) allowed.add("galaxy");
-    if (upgradeCounts[3] >= 200) allowed.add("crown");
-    if (upgradeCounts[4] >= 250) allowed.add("soccer");
-    if (upgradeCounts[5] >= 300) allowed.add("arcade");
-    if (upgradeCounts[6] >= 350) allowed.add("death");
-    if (upgradeCounts[7] >= 400) allowed.add("angel");
-
-    let oldOrder = getUnlockedOrder();
-    let newOrder = ["default"];
-    for (let key of oldOrder) {
-        if (allowed.has(key) && !newOrder.includes(key) && key !== "default") newOrder.push(key);
-    }
-    let canonical = ["cake", "diamond", "galaxy", "crown", "soccer", "arcade", "death", "angel"];
-    for (let key of canonical) {
-        if (allowed.has(key) && !newOrder.includes(key)) newOrder.push(key);
-    }
-    saveUnlocked(allowed, newOrder);
-
-    let cur = getCurrentWorldKey();
-    if (!allowed.has(cur)) {
-        setCurrentWorldKey("default");
-    }
+.minigame-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
 }
 
-function ensureUnlockedPanel() {
-    if (!document.getElementById("unlocked_panel")) {
-        let panel = document.createElement("div");
-        panel.id = "unlocked_panel";
-        panel.className = "unlocked-panel";
-        panel.innerHTML = `
-      <h3>Unlocked Worlds</h3>
-      <div id="unlocked_list" class="unlocked-list"></div>
-      <div class="panel-controls" style="margin-top:10px;display:flex;justify-content:flex-end;">
-        <button id="btnReset" type="button">Reset progress</button>
-        <button id="btn-minigame">Start Minigame</button>
-        <div id="minigame-overlay" class="minigame-overlay" style="display:none;">
-          <div class="minigame-container">
-            <h2>Minigame: Klik zoveel mogelijk munten!</h2>
-            <div id="minigame-timer">60</div>
-            <div id="minigame-score">Score: 0</div>
-            <img src="Coin.png" id="minigame-coin" class="coin-icon" alt="Coin">
-            <div id="minigame-result" style="display:none;">
-              <p id="minigame-final-score"></p>
-              <p id="minigame-highscore"></p>
-              <button id="btn-return">Terug naar hoofdspel</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-        document.querySelector(".buttons").appendChild(panel);
-        panel.querySelector("#btnReset").addEventListener("click", () => {
-            if (confirm("Weet je zeker dat je ALLES wilt resetten?")) {
-                hardReset();
-            }
-        });
+.minigame-modal.active {
+    display: flex;
+}
+
+.minigame-content {
+    background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.minigame-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.minigame-timer {
+    font-size: 4rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.minigame-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.minigame-coin {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.minigame-coin img {
+    width: 128px;
+    height: 128px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    animation: pulse 2s infinite;
+}
+
+.minigame-coin img:hover {
+    transform: scale(1.1);
+}
+
+.minigame-coin img:active {
+    transform: scale(0.95);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
     }
-}
 
-function renderUnlocked() {
-    ensureUnlockedPanel();
-    let list = document.getElementById("unlocked_list");
-    list.innerHTML = "";
-    let order = getUnlockedOrder();
-    let currentKey = getCurrentWorldKey();
-    if (!order.includes("default")) order = ["default", ...order];
-    order.forEach(key => {
-        let meta = WORLDS[key];
-        if (!meta) return;
-        let btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "unlock-badge" + (key === currentKey ? " active" : "");
-        btn.innerHTML = `
-      <img src="${meta.coin}" alt="${meta.title}">
-      <div class="name">${meta.title}</div>
-    `;
-        btn.addEventListener("click", () => {
-            applyWorldByKey(key, true);
-        });
-        list.appendChild(btn);
-    });
-}
-
-function applyWorldByKey(key, fromUserClick = false) {
-    let meta = WORLDS[key];
-    if (!meta) return;
-    let coinImg = document.querySelector(".coin-icon");
-    coinImg.src = meta.coin;
-    document.body.style.backgroundImage = `url("${meta.bg}")`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundAttachment = "fixed";
-    currentThemeIndex = meta.themeIndex ?? -1;
-    setCurrentWorldKey(key);
-    highlightCurrentWorld();
-    if (fromUserClick) {
-        let rect = coinImg.getBoundingClientRect();
-        let particleClass = getParticleClass(currentThemeIndex);
-        spawnParticles(particleClass, rect.left + rect.width / 2, rect.top + rect.height / 2, 10);
+    50% {
+        opacity: 0.8;
     }
 }
 
-function highlightCurrentWorld() {
-    let currentKey = getCurrentWorldKey();
-    document.querySelectorAll(".unlock-badge").forEach(el => el.classList.remove("active"));
-    let order = getUnlockedOrder();
-    let idx = order.indexOf(currentKey);
-    let list = document.getElementById("unlocked_list");
-    let highlightIndex = idx;
-    if (currentKey === "default") highlightIndex = 0;
-    if (list && highlightIndex > -1 && list.children[highlightIndex]) {
-        list.children[highlightIndex].classList.add("active");
-    } else if (currentKey === "default" && list && list.children[0]) {
-        list.children[0].classList.add("active");
-    }
+.minigame-results {
+    text-align: center;
+    color: white;
 }
 
-function click_actie() {
-    coin += klik_kracht;
-    ui_update();
-    let coinImg = document.querySelector('.coin-icon');
-    coinImg.classList.add('clicked');
-    setTimeout(() => coinImg.classList.remove('clicked'), 100);
-    createFloatingText(`+${klik_kracht}`);
-    let rect = coinImg.getBoundingClientRect();
-    spawnParticles(getParticleClass(currentThemeIndex), rect.left + rect.width / 2, rect.top + rect.height / 2, 5);
-    playPlop();
+.minigame-final {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
 }
 
-function createFloatingText(text) {
-    let coinImg = document.querySelector('.coin-icon');
-    let rect = coinImg.getBoundingClientRect();
-    let floating = document.createElement('div');
-    floating.className = 'floating-text';
-    floating.innerText = text;
-    floating.style.left = rect.left + rect.width / 2 + 'px';
-    floating.style.top = rect.top + rect.height / 2 + 'px';
-    document.body.appendChild(floating);
-    setTimeout(() => floating.remove(), 900);
+.minigame-final-score {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
-function spawnParticles(particleClass, x, y, count) {
-    for (let i = 0; i < count; i++) {
-        let p = document.createElement("div");
-        p.className = particleClass;
-        let angle = Math.random() * 2 * Math.PI;
-        let distance = 40 + Math.random() * 30;
-        let offsetX = Math.cos(angle) * distance;
-        let offsetY = Math.sin(angle) * distance;
-        let rotation = Math.random() * 360;
-        let scale = 0.5 + Math.random() * 0.5;
-        p.style.setProperty("--x", `${offsetX}px`);
-        p.style.setProperty("--y", `${offsetY}px`);
-        p.style.left = x + "px";
-        p.style.top = y + "px";
-        p.style.transform = `rotate(${rotation}deg) scale(${scale})`;
-        document.body.appendChild(p);
-        setTimeout(() => p.remove(), 800);
-    }
+.minigame-highscore {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
-function getParticleClass(themeIndex) {
-    switch (themeIndex) {
-        case 0:
-            return "cake-particle";
-        case 1:
-            return "diamond-particle";
-        case 2:
-            return "galaxy-particle";
-        case 3:
-            return "crown-particle";
-        case 4:
-            return "soccer-particle";
-        case 5:
-            return "arcade-particle";
-        case 6:
-            return "death-particle";
-        case 7:
-            return "angel-particle";
-        default:
-            return "coin-particle";
-    }
+.new-highscore {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fde68a;
+    margin-bottom: 1rem;
+    animation: bounce 1s infinite;
 }
 
-function Upgrade(index) {
-    if (coin >= COSTS[index]) {
-        coin -= COSTS[index];
-        upgradeCounts[index]++;
-        recalcFromCounts();
-        document.getElementById(`count${index}`).innerText = upgradeCounts[index];
-        ui_update();
-        flashButton(`upgrade${COSTS[index]}`);
-        showExtraUpgrade(index);
-        playKaching();
-        if (index === 0 && upgradeCounts[0] === 50) {
-            unlockWorld(0, "Minecraft.png", "Grass.png", "🎉 Cake World unlocked! 🍰", "cake");
-        }
-        if (index === 1 && upgradeCounts[1] === 100) {
-            unlockWorld(1, "Diamond.png", "Mine.png", "💎 Diamond World unlocked!", "diamond");
-        }
-        if (index === 2 && upgradeCounts[2] === 150) {
-            unlockWorld(2, "Galaxy.png", "Space.png", "🌌 Galaxy World unlocked!", "galaxy");
-        }
-        if (index === 3 && upgradeCounts[3] === 200) {
-            unlockWorld(3, "Crown.png", "Palace.png", "👑 Royal World unlocked!", "crown");
-        }
-        if (index === 4 && upgradeCounts[4] === 250) {
-            unlockWorld(4, "Soccer.png", "Stadion.png", "⚽ Soccer World unlocked!", "soccer");
-        }
-        if (index === 5 && upgradeCounts[5] === 300) {
-            unlockWorld(5, "Arcade.png", "Gamestate.png", "🕹️ Arcade World unlocked!", "arcade");
-        }
-        if (index === 6 && upgradeCounts[6] === 350) {
-            unlockWorld(6, "Death.png", "Graveyard.png", "☠️ Death World unlocked! The Final Stage!", "death");
-        }
-        if (index === 7 && upgradeCounts[7] === 400) {
-            unlockWorld(7, "Engel.png", "Heaven.png", "😇 Heaven World unlocked! Ascension achieved!", "angel");
-        }
-        saveGame();
-    }
+.btn-return {
+    padding: 0.75rem 2rem;
+    background: white;
+    color: #9333ea;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-function showExtraUpgrade(index) {
-    let extraContainer = document.getElementById("extra_upgrades");
-    if (!extraContainer.querySelector(`#extra_${index}`)) {
-        let img = document.createElement("img");
-        img.src = (THEMES[index] && THEMES[index].file) ? THEMES[index].file : "Coin.png";
-        img.id = `extra_${index}`;
-        img.className = "extra-upgrade";
-        extraContainer.appendChild(img);
-    }
+.btn-return:hover {
+    background: #f3f4f6;
 }
 
-function unlockWorld(themeIndex, coinImage, bgImage, message, unlockKey) {
-    let coinImg = document.querySelector(".coin-icon");
-    coinImg.src = coinImage;
-    document.body.style.backgroundImage = `url("${bgImage}")`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundAttachment = "fixed";
-    currentThemeIndex = themeIndex;
-    let rect = coinImg.getBoundingClientRect();
-    let particleClass = getParticleClass(themeIndex);
-    spawnParticles(particleClass, rect.left + rect.width / 2, rect.top + rect.height / 2, 15);
-    let popup = document.getElementById("achievementPopup");
-    popup.innerText = message;
-    popup.style.display = "block";
-    popup.style.animation = "popupFade 2s forwards";
-    setTimeout(() => (popup.style.display = "none"), 2000);
-    if (unlockKey) {
-        addUnlock(unlockKey);
-        setCurrentWorldKey(unlockKey);
-        renderUnlocked();
-        highlightCurrentWorld();
+@media (max-width: 768px) {
+    .world-title {
+        font-size: 2.5rem;
     }
-}
 
-function ui_update() {
-    document.getElementById("coin_counter").innerText =
-        `Coins: ${Math.floor(coin)} (+${klik_kracht} per klik)`;
-    let costIds = ["upgrade10", "upgrade50", "upgrade100", "upgrade1000", "upgrade2000", "upgrade10000", "upgrade50000", "upgrade100000"];
-    for (let i = 0; i < costIds.length; i++) {
-        document.getElementById(costIds[i]).disabled = coin < COSTS[i];
+    .coin-counter {
+        font-size: 1.5rem;
     }
-}
 
-function flashButton(id) {
-    let btn = document.getElementById(id);
-    btn.classList.add('upgrade-flash', 'upgrade-press');
-    setTimeout(() => btn.classList.remove('upgrade-flash', 'upgrade-press'), 200);
-}
+    .coin-icon,
+    .coin-emoji {
+        width: 150px;
+        height: 150px;
+    }
 
-function playPlop() {
-    let audio = new Audio("plop.mp3");
-    audio.volume = 0.3;
-    audio.play();
-}
+    .coin-emoji {
+        font-size: 150px;
+    }
 
-function playKaching() {
-    let audio = new Audio("kaching.mp3");
-    audio.volume = 0.3;
-    audio.play();
-}
+    .upgrades-grid {
+        grid-template-columns: 1fr;
+    }
 
-function recalcFromCounts() {
-    klik_kracht = 1 + CLICK_INC.reduce((sum, inc, i) => sum + inc * (upgradeCounts[i] || 0), 0);
-    autoCoinIncrements = AUTO_INC.map((inc, i) => inc * (upgradeCounts[i] || 0));
-}
-
-function saveGame() {
-    try {
-        let payload = {
-            coins: coin,
-            counts: upgradeCounts
-        };
-        localStorage.setItem(SAVE_KEY_GAME, JSON.stringify(payload));
-    } catch (e) {
-        console.warn("Kon game niet opslaan:", e);
+    .action-buttons {
+        flex-direction: column;
     }
 }
-
-function loadGame() {
-    try {
-        let raw = localStorage.getItem(SAVE_KEY_GAME);
-        if (!raw) {
-            recalcFromCounts();
-            return;
-        }
-        let data = JSON.parse(raw);
-        coin = Number(data.coins || 0);
-        let savedCounts = Array.isArray(data.counts) ? data.counts : [];
-        for (let i = 0; i < upgradeCounts.length; i++) {
-            upgradeCounts[i] = Number(savedCounts[i] || 0);
-            let span = document.getElementById(`count${i}`);
-            if (span) span.textContent = upgradeCounts[i];
-        }
-        recalcFromCounts();
-    } catch (e) {
-        console.warn("Kon game niet laden:", e);
-        recalcFromCounts();
-    }
-}
-
-function hardReset() {
-    coin = 0;
-    upgradeCounts = Array(8).fill(0);
-    recalcFromCounts();
-    saveGame();
-    let allowed = new Set(["default"]);
-    let order = ["default"];
-    saveUnlocked(allowed, order);
-    setCurrentWorldKey("default");
-    for (let i = 0; i < 8; i++) {
-        let span = document.getElementById(`count${i}`);
-        if (span) span.textContent = "0";
-    }
-    let extra = document.getElementById("extra_upgrades");
-    if (extra) extra.innerHTML = "";
-    applyWorldByKey("default", false);
-    renderUnlocked();
-    highlightCurrentWorld();
-    ui_update();
-    let popup = document.getElementById("achievementPopup");
-    popup.innerText = "🔄 Progress gereset!";
-    popup.style.display = "block";
-    popup.style.animation = "popupFade 2s forwards";
-    setTimeout(() => (popup.style.display = "none"), 2000);
-}
-class MiniGame {
-    constructor() {
-        this.score = 0;
-        this.highscore = Number(localStorage.getItem('minigame_highscore') || 0);
-        this.timeLeft = 60;
-        this.timerInterval = null;
-        this.overlay = document.getElementById('minigame-overlay');
-        this.coin = document.getElementById('minigame-coin');
-        this.timerEl = document.getElementById('minigame-timer');
-        this.scoreEl = document.getElementById('minigame-score');
-        this.result = document.getElementById('minigame-result');
-        this.finalScore = document.getElementById('minigame-final-score');
-        this.highscoreEl = document.getElementById('minigame-highscore');
-        this.btnReturn = document.getElementById('btn-return');
-        this.coin.addEventListener('click', () => this.clickCoin());
-        this.btnReturn.addEventListener('click', () => this.close());
-        document.getElementById('btn-minigame').addEventListener('click', () => this.start());
-    }
-    start() {
-        this.score = 0;
-        this.timeLeft = 60;
-        this.overlay.style.display = 'flex';
-        this.result.style.display = 'none';
-        this.updateUI();
-        this.timerInterval = setInterval(() => {
-            this.timeLeft--;
-            this.timerEl.textContent = this.timeLeft;
-            if (this.timeLeft <= 0) this.end();
-        }, 1000);
-    }
-    clickCoin() {
-        this.score++;
-        this.scoreEl.textContent = `Score: ${this.score}`;
-        this.coin.classList.add('clicked');
-        setTimeout(() => this.coin.classList.remove('clicked'), 100);
-    }
-    end() {
-        clearInterval(this.timerInterval);
-        this.result.style.display = 'block';
-        this.finalScore.textContent = `Jouw score: ${this.score}`;
-        if (this.score > this.highscore) {
-            this.highscore = this.score;
-            localStorage.setItem('minigame_highscore', this.highscore);
-        }
-        this.highscoreEl.textContent = `Highscore: ${this.highscore}`;
-    }
-    close() {
-        this.overlay.style.display = 'none';
-    }
-    updateUI() {
-        this.timerEl.textContent = this.timeLeft;
-        this.scoreEl.textContent = `Score: ${this.score}`;
-    }
-}
-
-function attachEventListeners() {
-    let coinImg = document.querySelector(".coin-icon");
-    coinImg.addEventListener("click", click_actie);
-    let btnIds = [
-    ["upgrade10", 0],
-    ["upgrade50", 1],
-    ["upgrade100", 2],
-    ["upgrade1000", 3],
-    ["upgrade2000", 4],
-    ["upgrade10000", 5],
-    ["upgrade50000", 6],
-    ["upgrade100000", 7],
-  ];
-    btnIds.forEach(([id, idx]) => {
-        let el = document.getElementById(id);
-        if (el) el.addEventListener("click", () => Upgrade(idx));
-    });
-}
-(function init() {
-    loadGame();
-    reconcileUnlocksWithProgress();
-    ensureUnlockedPanel();
-    renderUnlocked();
-    let savedWorld = getCurrentWorldKey();
-    let unlockedNow = getUnlockedSet();
-    if (!savedWorld || !unlockedNow.has(savedWorld)) {
-        savedWorld = "default";
-        setCurrentWorldKey(savedWorld);
-    }
-    applyWorldByKey(savedWorld, false);
-    setInterval(() => {
-        coin += autoCoinIncrements.reduce((a, b) => a + b, 0);
-        ui_update();
-    }, 1000);
-    setInterval(saveGame, 5000);
-    window.addEventListener('beforeunload', saveGame);
-    ui_update();
-    attachEventListeners();
-    let minigame = new MiniGame();
-})();
